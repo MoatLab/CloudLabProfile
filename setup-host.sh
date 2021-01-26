@@ -101,8 +101,9 @@ function set_performance_mode()
 function configure_cpu()
 {
     set_performance_mode
-    toggle_cpu_turbo_boost off
-    #toggle_cpu_hyper_threading off
+    toggle_cpu_cstate off
+    toggle_cpu_hyper_threading off
+    #toggle_cpu_turbo_boost off
 }
 
 function flush_pagecache()
