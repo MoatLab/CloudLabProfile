@@ -7,10 +7,10 @@ function install_packages()
     sudo apt install -y numactl htop sysstat linux-tools-generic linux-tools-$(uname -r)
 
     # For QEMU
-    sudo apt install qemu-kvm
+    sudo apt install -y qemu-kvm
 
     # For rocksdb
-    sudo apt-get install libgflags-dev libsnappy-dev zlib1g-dev libbz2-dev liblz4-dev libzstd-dev
+    sudo apt install -y libgflags-dev libsnappy-dev zlib1g-dev libbz2-dev liblz4-dev libzstd-dev
 
     # For kernel development
 
@@ -101,8 +101,8 @@ function set_performance_mode()
 function configure_cpu()
 {
     set_performance_mode
-    disable_cpu_turbo_boost
-    #disable_cpu_hyper_threading
+    toggle_cpu_turbo_boost off
+    #toggle_cpu_hyper_threading off
 }
 
 function flush_pagecache()
