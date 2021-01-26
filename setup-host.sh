@@ -6,13 +6,14 @@ function install_packages()
     # Some system tools I regularly use
     sudo apt install -y numactl htop sysstat linux-tools-generic linux-tools-$(uname -r)
 
-    # For QEMU
+    # For QEMU/KVM
     sudo apt install -y qemu-kvm
 
     # For rocksdb
     sudo apt install -y libgflags-dev libsnappy-dev zlib1g-dev libbz2-dev liblz4-dev libzstd-dev
 
-    # For kernel development
+    # For development
+    sudo apt install -y cmake libncurses5-dev ninja-build meson
 
 }
 
@@ -30,17 +31,21 @@ function clone_repos()
 
 function configure_system()
 {
-    #-------------------------------------------------------------------------------
-    # Configurations for RocksDB
-    # Install rocksdb dependencies
+    LIMITS_CONF="/etc/security/limits.conf"
+
     # Enlarge maximum allowed number of open files
     sudo sed -i 's/^#DefaultLimitNOFILE=.*/DefaultLimitNOFILE=65536/' /etc/systemd/system.conf
 
-    echo "*         hard    nofile      500000" | sudo tee -a /etc/security/limits.conf
-    echo "*         soft    nofile      500000" | sudo tee -a /etc/security/limits.conf
+    if [[ $(grep "*         hard    nofile" $LIMITS_CONF) == "" ]]; then
+        echo "*         hard    nofile      500000" | sudo tee -a /etc/security/limits.conf
+        echo "*         soft    nofile      500000" | sudo tee -a /etc/security/limits.conf
+    fi
+
     # Increase the total number of open files system-wide
-    echo 'fs.file-max = 2097152'  | sudo tee -a /etc/sysctl.conf
-    sysctl -p
+    if [[ $(grep "^fs.file-max" /etc/sysctl.conf) == "" ]]; then
+        echo 'fs.file-max = 2097152'  | sudo tee -a /etc/sysctl.conf
+        sudo sysctl -p
+    fi
 }
 
 # $1: "on" "off"
@@ -114,6 +119,8 @@ function flush_pagecache()
 #-------------------------------------------------------------------------------
 # Main
 #-------------------------------------------------------------------------------
-install_packages
 configure_system
 configure_cpu
+
+install_packages
+clone_repos
