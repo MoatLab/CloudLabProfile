@@ -115,7 +115,6 @@ for i in range(params.nodeCount):
     else:
         name = "node" + str(i)
         node = request.RawPC(name)
-        node.addService(pg.Execute('/bin/sh','/local/repository/setup-host.sh'))
 
         # Connect to the persistent dataset (remote block storage)
         iface = node.addInterface()
@@ -153,6 +152,8 @@ for i in range(params.nodeCount):
         bs.placement = "any"
         pass
     pass
+
+    node.addService(pg.Execute('/bin/sh','/local/repository/setup-host.sh'))
 
 # Print the generated rspec
 pc.printRequestRSpec(request)
