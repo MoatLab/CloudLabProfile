@@ -4,7 +4,7 @@ function install_packages()
 {
     sudo apt update
     # Some system tools I regularly use
-    sudo apt install -y numactl htop sysstat linux-tools-generic linux-tools-$(uname -r)
+    sudo apt install -y numactl htop sysstat linux-tools-generic linux-tools-$(uname -r) i7z
 
     # For QEMU/KVM
     sudo apt install -y qemu-kvm
@@ -13,7 +13,11 @@ function install_packages()
     sudo apt install -y libgflags-dev libsnappy-dev zlib1g-dev libbz2-dev liblz4-dev libzstd-dev
 
     # For development
+    sudo apt install -y cscope exuberant-ctags silversearcher-ag
     sudo apt install -y cmake libncurses5-dev ninja-build meson
+
+    # For benchmarking
+    sudo apt install -y fio
 
 }
 
@@ -29,23 +33,46 @@ function clone_repos()
     git clone https://github.com/facebook/rocksdb.git fb-rocksdb
 }
 
+function configure_sudo_passwdless()
+{
+    me=$(whoami)
+    STR="${me} ALL=(ALL) NOPASSWD: ALL"
+    if [[ $(sudo grep $STR /etc/sudoers) == "" ]]; then
+        echo $STR | sudo tee -a /etc/sudoers >/dev/null
+    fi
+}
+
 function configure_system()
 {
+    # sysctl changes does not need reboot to take effect, do "sysctl -p" though
+    SYSCTL_CONF="/etc/sysctl.conf"
     LIMITS_CONF="/etc/security/limits.conf"
+    SYSTEMD_CONF="/etc/systemd/system.conf"
 
     # Enlarge maximum allowed number of open files
-    sudo sed -i 's/^#DefaultLimitNOFILE=.*/DefaultLimitNOFILE=65536/' /etc/systemd/system.conf
+    sudo sed -i 's/^#DefaultLimitNOFILE=.*/DefaultLimitNOFILE=65536/' $SYSTEMD_CONF
 
-    if [[ $(grep "*         hard    nofile" $LIMITS_CONF) == "" ]]; then
-        echo "*         hard    nofile      500000" | sudo tee -a /etc/security/limits.conf
-        echo "*         soft    nofile      500000" | sudo tee -a /etc/security/limits.conf
+    SOFT_NOFILE_LIMIT="*         soft    nofile      500000"
+    HARD_NOFILE_LIMIT="*         hard    nofile      500000"
+    if [[ $(grep $SOFT_NOFILE_LIMIT $LIMITS_CONF) == "" ]]; then
+        echo $SOFT_NOFILE_LIMIT | sudo tee -a $LIMITS_CONF
+        echo $HARD_NOFILE_LIMIT | sudo tee -a $LIMITS_CONF
     fi
 
+    FS_FILE_MAX="fs.file-max = 2097152"
     # Increase the total number of open files system-wide
-    if [[ $(grep "^fs.file-max" /etc/sysctl.conf) == "" ]]; then
-        echo 'fs.file-max = 2097152'  | sudo tee -a /etc/sysctl.conf
-        sudo sysctl -p
+    if [[ $(grep "^fs.file-max" $SYSCTL_CONF) == "" ]]; then
+        echo $FS_FILE_MAX  | sudo tee -a $SYSCTL_CONF
     fi
+
+    # Disable swapping
+    sudo swapoff -a
+    if [[ $(grep "^vm.swappiness" $SYSCTL_CONF) == "" ]]; then
+        echo 'vm.swappiness=0' | sudo tee -a $SYSCTL_CONF
+    else
+        sudo sed -i 's/^vm.swappiness=.*/vm.swappiness=0' $SYSCTL_CONF
+    fi
+    sudo sysctl -p
 }
 
 # $1: "on" "off"

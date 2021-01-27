@@ -122,7 +122,8 @@ for i in range(params.nodeCount):
         # The remote file system is represented by special node.
         fsnode = request.RemoteBlockstore("fsnode", "/pdata")
         # This URN is displayed in the web interfaace for your dataset.
-        fsnode.dataset = "urn:publicid:IDN+wisc.cloudlab.us:nestfarm-pg0+ltdataset+ioda-vm-image"
+        #fsnode.dataset = "urn:publicid:IDN+wisc.cloudlab.us:nestfarm-pg0+ltdataset+ioda-vm-image"
+        fsnode.dataset = "urn:publicid:IDN+wisc.cloudlab.us:nestfarm-pg0+ltdataset+ioda-vm-image2"
         fslink = request.Link("fslink")
         fslink.addInterface(iface)
         fslink.addInterface(fsnode.interface)
