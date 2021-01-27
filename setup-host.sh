@@ -1,5 +1,7 @@
 #!/bin/bash
 
+LOGF="p.log"
+
 function install_packages()
 {
     sudo apt update
@@ -19,6 +21,7 @@ function install_packages()
     # For benchmarking
     sudo apt install -y fio
 
+    echo "==> [$(date)] $0 done ..."
 }
 
 function clone_repos()
@@ -31,6 +34,8 @@ function clone_repos()
     git clone https://github.com/qemu/qemu.git
     # rocksdb
     git clone https://github.com/facebook/rocksdb.git fb-rocksdb
+
+    echo "==> [$(date)] $0 done ..."
 }
 
 function configure_sudo_passwdless()
@@ -38,8 +43,10 @@ function configure_sudo_passwdless()
     me=$(whoami)
     STR="${me} ALL=(ALL) NOPASSWD: ALL"
     if [[ $(sudo grep $STR /etc/sudoers) == "" ]]; then
-        echo $STR | sudo tee -a /etc/sudoers >/dev/null
+        echo "$STR" | sudo tee -a /etc/sudoers >/dev/null
     fi
+
+    echo "==> [$(date)] $0 done ... with (me: $me)"
 }
 
 function configure_system()
@@ -73,6 +80,9 @@ function configure_system()
         sudo sed -i 's/^vm.swappiness=.*/vm.swappiness=0' $SYSCTL_CONF
     fi
     sudo sysctl -p
+
+    # sudo passwdless
+    configure_sudo_passwdless
 }
 
 # $1: "on" "off"
@@ -92,6 +102,8 @@ function toggle_cpu_turbo_boost()
     fi
 
     echo $val | sudo tee -a ${SYS_NO_TURBO} >/dev/null
+
+    echo "==> [$(date)] $0 done ... now turbo is [$param]"
 }
 
 # $1: "on", "off"
@@ -105,6 +117,8 @@ function toggle_cpu_hyper_threading()
     fi
 
     echo $param | sudo tee ${SYS_SMT_CONTROL} >/dev/null
+
+    echo "==> [$(date)] $0 done ... now HT is [$param]"
 }
 
 # $1: "on", "off"
@@ -120,14 +134,17 @@ function toggle_cpu_cstate()
             echo "===> Error: CPU C-state not disabled ..."
         fi
     fi
+
+    echo "==> [$(date)] $0 done ... now C-state is [$param]"
 }
 
 function set_performance_mode()
 {
-    echo "===> Placing CPUs in performance mode ..."
     for governor in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do
         echo performance | sudo tee $governor >/dev/null
     done
+
+    echo "==> [$(date)] $0 done ... now CPUs are in [performance] mode"
 }
 
 function configure_cpu()
@@ -146,8 +163,10 @@ function flush_pagecache()
 #-------------------------------------------------------------------------------
 # Main
 #-------------------------------------------------------------------------------
-configure_system
-configure_cpu
+{
+    configure_system
+    configure_cpu
 
-install_packages
-clone_repos
+    install_packages
+    clone_repos
+} 2>&1 > $LOGF
