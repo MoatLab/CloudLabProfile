@@ -42,7 +42,7 @@ function configure_sudo_passwdless()
 {
     me=$(whoami)
     STR="${me} ALL=(ALL) NOPASSWD: ALL"
-    if [[ $(sudo grep "$STR" /etc/sudoers) == "" ]]; then
+    if [[ "$(sudo grep "$STR" /etc/sudoers)" == "" ]]; then
         echo "$STR" | sudo tee -a /etc/sudoers >/dev/null
     fi
 
@@ -61,21 +61,21 @@ function configure_system()
 
     SOFT_NOFILE_LIMIT="*         soft    nofile      500000"
     HARD_NOFILE_LIMIT="*         hard    nofile      500000"
-    if [[ $(grep "${SOFT_NOFILE_LIMIT}" $LIMITS_CONF) == "" ]]; then
-        echo $SOFT_NOFILE_LIMIT | sudo tee -a $LIMITS_CONF
-        echo $HARD_NOFILE_LIMIT | sudo tee -a $LIMITS_CONF
+    if [[ "$(grep "${SOFT_NOFILE_LIMIT}" $LIMITS_CONF)" == "" ]]; then
+        echo "${SOFT_NOFILE_LIMIT}" | sudo tee -a $LIMITS_CONF
+        echo "${HARD_NOFILE_LIMIT}" | sudo tee -a $LIMITS_CONF
     fi
 
     FS_FILE_MAX="fs.file-max = 2097152"
     # Increase the total number of open files system-wide
-    if [[ $(grep "^fs.file-max" $SYSCTL_CONF) == "" ]]; then
-        echo $FS_FILE_MAX  | sudo tee -a $SYSCTL_CONF
+    if [[ "$(grep "^fs.file-max" $SYSCTL_CONF)" == "" ]]; then
+        echo "${FS_FILE_MAX}" | sudo tee -a $SYSCTL_CONF
     fi
 
     # Disable swapping
     sudo swapoff -a
-    if [[ $(grep "^vm.swappiness" $SYSCTL_CONF) == "" ]]; then
-        echo 'vm.swappiness=0' | sudo tee -a $SYSCTL_CONF
+    if [[ "$(grep "^vm.swappiness" $SYSCTL_CONF)" == "" ]]; then
+        echo "vm.swappiness=0" | sudo tee -a $SYSCTL_CONF
     else
         sudo sed -i 's/^vm.swappiness=.*/vm.swappiness=0/' $SYSCTL_CONF
     fi
@@ -92,16 +92,16 @@ function toggle_cpu_turbo_boost()
     local val=0
     SYS_NO_TURBO="/sys/devices/system/cpu/intel_pstate/no_turbo"
 
-    if [[ $param == "on" ]]; then
+    if [[ "$param" == "on" ]]; then
         val=0
-    elif [[ $param == "off" ]]; then
+    elif [[ "$param" == "off" ]]; then
         val=1
     else
         echo "===>Error: $0 only accepts \"on\" and \"off\" parameters"
         val=1
     fi
 
-    echo $val | sudo tee -a ${SYS_NO_TURBO} >/dev/null
+    echo "$val" | sudo tee -a ${SYS_NO_TURBO} >/dev/null
 
     echo "==> [$(date)] $0 done ... now turbo is [$param]"
 }
@@ -112,11 +112,11 @@ function toggle_cpu_hyper_threading()
     param=$1
     SYS_NO_TURBO="/sys/devices/system/cpu/smt/control"
 
-    if [[ $param != "on" && $param != "off" ]]; then
+    if [[ "$param" != "on" && "$param" != "off" ]]; then
         echo "===>Error: $0 only accepts \"on\" and \"off\" parameters"
     fi
 
-    echo $param | sudo tee ${SYS_SMT_CONTROL} >/dev/null
+    echo "$param" | sudo tee ${SYS_SMT_CONTROL} >/dev/null
 
     echo "==> [$(date)] $0 done ... now HT is [$param]"
 }
@@ -125,12 +125,12 @@ function toggle_cpu_hyper_threading()
 function toggle_cpu_cstate()
 {
     param=$1
-    if [[ $param == "on" ]]; then
+    if [[ "$param" == "on" ]]; then
         sudo killall a.out
-    elif [[ $param == "off" ]]; then
+    elif [[ "$param" == "off" ]]; then
         sudo killall a.out
         sudo nohup ./a.out 2>/dev/null &
-        if [[ $(ps -ef | grep a.out | grep -v grep) == "" ]]; then
+        if [[ "$(ps -ef | grep a.out | grep -v grep)" == "" ]]; then
             echo "===> Error: CPU C-state not disabled ..."
         fi
     fi
@@ -163,10 +163,13 @@ function flush_pagecache()
 #-------------------------------------------------------------------------------
 # Main
 #-------------------------------------------------------------------------------
+function main()
 {
     configure_system
     configure_cpu
 
     install_packages
     clone_repos
-} > ${LOGF} 2>&1
+}
+
+main > $LOGF 2>&1
