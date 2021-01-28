@@ -4,22 +4,22 @@ LOGF="p.log"
 
 function install_packages()
 {
-    sudo apt update
+    sudo apt-get update
     # Some system tools I regularly use
-    sudo apt install -y numactl htop sysstat linux-tools-generic linux-tools-$(uname -r) i7z
+    sudo apt-get install -y numactl htop sysstat linux-tools-generic linux-tools-$(uname -r) i7z
 
     # For QEMU/KVM
-    sudo apt install -y qemu-kvm
+    sudo apt-get install -y qemu-kvm
 
     # For rocksdb
-    sudo apt install -y libgflags-dev libsnappy-dev zlib1g-dev libbz2-dev liblz4-dev libzstd-dev
+    sudo apt-get install -y libgflags-dev libsnappy-dev zlib1g-dev libbz2-dev liblz4-dev libzstd-dev
 
     # For development
-    sudo apt install -y cscope exuberant-ctags silversearcher-ag
-    sudo apt install -y cmake libncurses5-dev ninja-build meson
+    sudo apt-get install -y cscope exuberant-ctags silversearcher-ag
+    sudo apt-get install -y cmake libncurses5-dev ninja-build meson
 
     # For benchmarking
-    sudo apt install -y fio
+    sudo apt-get install -y fio
 
     echo "==> [$(date)] $0 done ..."
 }
@@ -42,7 +42,7 @@ function configure_sudo_passwdless()
 {
     me=$(whoami)
     STR="${me} ALL=(ALL) NOPASSWD: ALL"
-    if [[ $(sudo grep $STR /etc/sudoers) == "" ]]; then
+    if [[ $(sudo grep "$STR" /etc/sudoers) == "" ]]; then
         echo "$STR" | sudo tee -a /etc/sudoers >/dev/null
     fi
 
@@ -61,7 +61,7 @@ function configure_system()
 
     SOFT_NOFILE_LIMIT="*         soft    nofile      500000"
     HARD_NOFILE_LIMIT="*         hard    nofile      500000"
-    if [[ $(grep $SOFT_NOFILE_LIMIT $LIMITS_CONF) == "" ]]; then
+    if [[ $(grep "${SOFT_NOFILE_LIMIT}" $LIMITS_CONF) == "" ]]; then
         echo $SOFT_NOFILE_LIMIT | sudo tee -a $LIMITS_CONF
         echo $HARD_NOFILE_LIMIT | sudo tee -a $LIMITS_CONF
     fi
@@ -77,7 +77,7 @@ function configure_system()
     if [[ $(grep "^vm.swappiness" $SYSCTL_CONF) == "" ]]; then
         echo 'vm.swappiness=0' | sudo tee -a $SYSCTL_CONF
     else
-        sudo sed -i 's/^vm.swappiness=.*/vm.swappiness=0' $SYSCTL_CONF
+        sudo sed -i 's/^vm.swappiness=.*/vm.swappiness=0/' $SYSCTL_CONF
     fi
     sudo sysctl -p
 
@@ -169,4 +169,4 @@ function flush_pagecache()
 
     install_packages
     clone_repos
-} 2>&1 > $LOGF
+} > ${LOGF} 2>&1
