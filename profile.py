@@ -117,20 +117,21 @@ for i in range(params.nodeCount):
         name = "node" + str(i)
         node = request.RawPC(name)
 
-        # Connect to the persistent dataset (remote block storage)
-        iface = node.addInterface()
-        # The remote file system is represented by special node.
-        fsnode = request.RemoteBlockstore("fsnode", "/pdata")
-        # This URN is displayed in the web interfaace for your dataset.
-        #fsnode.dataset = "urn:publicid:IDN+wisc.cloudlab.us:nestfarm-pg0+ltdataset+ioda-vm-image"
-        #fsnode.dataset = "urn:publicid:IDN+wisc.cloudlab.us:nestfarm-pg0+ltdataset+ioda-vm-image2"
-        fsnode.dataset = "urn:publicid:IDN+wisc.cloudlab.us:nestfarm-pg0+ltdataset+ioda-vm-image3"
-        fslink = request.Link("fslink")
-        fslink.addInterface(iface)
-        fslink.addInterface(fsnode.interface)
-        # Special attributes for this link that we must use.
-        fslink.best_effort = True
-        fslink.vlan_tagging = True
+        if False:
+            # Connect to the persistent dataset (remote block storage)
+            iface = node.addInterface()
+            # The remote file system is represented by special node.
+            fsnode = request.RemoteBlockstore("fsnode", "/pdata")
+            # This URN is displayed in the web interfaace for your dataset.
+            #fsnode.dataset = "urn:publicid:IDN+wisc.cloudlab.us:nestfarm-pg0+ltdataset+ioda-vm-image"
+            #fsnode.dataset = "urn:publicid:IDN+wisc.cloudlab.us:nestfarm-pg0+ltdataset+ioda-vm-image2"
+            fsnode.dataset = "urn:publicid:IDN+wisc.cloudlab.us:nestfarm-pg0+ltdataset+ioda-vm-image3"
+            fslink = request.Link("fslink")
+            fslink.addInterface(iface)
+            fslink.addInterface(fsnode.interface)
+            # Special attributes for this link that we must use.
+            fslink.best_effort = True
+            fslink.vlan_tagging = True
         pass
     if params.osImage and params.osImage != "default":
         node.disk_image = params.osImage
