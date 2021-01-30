@@ -169,7 +169,7 @@ function main()
     configure_cpu
 
     install_packages
-    clone_repos
+    #clone_repos
 }
 
 main > $LOGF 2>&1
