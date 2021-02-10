@@ -109,8 +109,8 @@ function toggle_cpu_turbo_boost()
 # $1: "on", "off"
 function toggle_cpu_hyper_threading()
 {
-    param=$1
-    SYS_NO_TURBO="/sys/devices/system/cpu/smt/control"
+    local param=$1
+    local SYS_SMT_CONTROL="/sys/devices/system/cpu/smt/control"
 
     if [[ "$param" != "on" && "$param" != "off" ]]; then
         echo "===>Error: $0 only accepts \"on\" and \"off\" parameters"
