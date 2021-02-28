@@ -126,6 +126,7 @@ for i in range(params.nodeCount):
             #fsnode.dataset = "urn:publicid:IDN+wisc.cloudlab.us:nestfarm-pg0+ltdataset+ioda-vm-image"
             fsnode.dataset = "urn:publicid:IDN+wisc.cloudlab.us:nestfarm-pg0+ltdataset+ioda-vm-image2"
             #fsnode.dataset = "urn:publicid:IDN+wisc.cloudlab.us:nestfarm-pg0+ltdataset+ioda-vm-image3"
+            #fsnode.dataset = "urn:publicid:IDN+wisc.cloudlab.us:nestfarm-pg0+ltdataset+ioda-vm-image4"
             fslink = request.Link("fslink")
             fslink.addInterface(iface)
             fslink.addInterface(fsnode.interface)
