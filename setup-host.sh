@@ -151,8 +151,8 @@ function configure_cpu()
 {
     set_performance_mode
     toggle_cpu_cstate off
-    toggle_cpu_hyper_threading off
     toggle_cpu_turbo_boost on
+    toggle_cpu_hyper_threading off
 }
 
 function flush_pagecache()
@@ -165,10 +165,10 @@ function flush_pagecache()
 #-------------------------------------------------------------------------------
 function main()
 {
+    install_packages
     configure_system
     configure_cpu
 
-    install_packages
     #clone_repos
 }
 
