@@ -1,4 +1,18 @@
 #!/bin/bash
+#
+# Huaicheng Li <lhcwhu@gmail.com>
+#
+# This is the first script we run after the CloudLab node is up, the goal of
+# this cript is to serve as a push-button solution so that the node is
+# configured properly after running this script so one can focus on the
+# experiments.
+#
+# Put all the following configuration tasks in this script:
+# - CPU related configs: disable hyperthreading, turbo boost, C-states, etc.
+# - System related configs: passwordless sudo, dep packages, etc.
+# - Any other customized initialization tasks (e.g., setup your home directory,
+#   etc.)
+#
 
 LOGF="p.log"
 

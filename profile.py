@@ -23,6 +23,7 @@ imageList = [
     ('default', 'Default Image'),
     ('urn:publicid:IDN+emulab.net+image+emulab-ops//UBUNTU18-64-STD', 'UBUNTU 18.04'),
     ('urn:publicid:IDN+wisc.cloudlab.us+image+nestfarm-PG0:HCL-U20', 'HCL U20.04'),
+    ('urn:publicid:IDN+wisc.cloudlab.us+image+nestfarm-PG0:HCL-U2204', 'HCL U22.04'), # Ubuntu 22.04.1 Linux kernel 6.0
     ('urn:publicid:IDN+emulab.net+image+emulab-ops//UBUNTU20-64-STD', 'UBUNTU 20.04'),
     ('urn:publicid:IDN+emulab.net+image+emulab-ops//UBUNTU16-64-STD', 'UBUNTU 16.04'),
     ('urn:publicid:IDN+emulab.net+image+emulab-ops//CENTOS7-64-STD',  'CENTOS 7'),
@@ -30,7 +31,7 @@ imageList = [
 
 pc.defineParameter("osImage", "Select OS image",
                    portal.ParameterType.IMAGE,
-                   imageList[2], imageList,
+                   imageList[3], imageList,
                    longDescription="Most clusters have this set of images, " +
                    "pick your favorite one.")
 
@@ -117,7 +118,7 @@ for i in range(params.nodeCount):
         name = "node" + str(i)
         node = request.RawPC(name)
 
-        if False:
+        if False: # HCL: persistent dataset (disabled)
             # Connect to the persistent dataset (remote block storage)
             iface = node.addInterface()
             # The remote file system is represented by special node.
@@ -159,6 +160,7 @@ for i in range(params.nodeCount):
         pass
     pass
 
+    # HCL: ``setup-host.sh`` will perform initial settings to the cloudlab node
     node.addService(pg.Execute('/bin/sh','/local/repository/setup-host.sh'))
 
 # Print the generated rspec
