@@ -8,7 +8,7 @@ sudo swapoff -a
 sudo umount /dev/sda4
 
 # Remove partition 3 & 4 first
-sudo parted $DEV resizepart 3 
+sudo parted $DEV resizepart 3
 sudo parted $DEV resizepart 4
 
 sudo parted $DEV resizepart 1 100%
